@@ -1,0 +1,88 @@
+
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Калькулятор податків на продаж нерухомості</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f9f9f9; padding: 20px; }
+        .container { max-width: 600px; background: #fff; padding: 20px; border-radius: 8px; margin: auto; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        input, select { width: 100%; margin: 10px 0; padding: 8px; }
+        .row { display: flex; align-items: center; margin-bottom: 15px; }
+        .row input[type="checkbox"] { width: auto; margin-right: 10px; }
+        button { background: #007bff; color: #fff; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; }
+        .result, .formula, .details { background: #e9ecef; padding: 10px; margin-top: 10px; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Калькулятор податків на продаж нерухомості, яка у власності менше 3 років</h2>
+        <label>Ціна купівлі ($):</label>
+        <input type="number" id="purchasePrice" />
+
+        <label>Ціна продажу ($):</label>
+        <input type="number" id="salePrice" />
+
+        <label>Тип нерухомості:</label>
+        <select id="propertyType">
+            <option>Квартира</option>
+            <option>Будинок</option>
+            <option>Комерційна нерухомість</option>
+            <option>Земля</option>
+        </select>
+
+        <div class="row">
+            <input type="checkbox" id="useService" />
+            <label for="useService">Із застосуванням послуги</label>
+        </div>
+
+        <button onclick="calculateTax()">Розрахувати</button>
+
+        <div id="result" class="result"></div>
+        <div id="formula" class="formula"></div>
+        <div id="details" class="details"></div>
+    </div>
+
+    <script>
+        function calculateTax() {
+            const purchasePrice = parseFloat(document.getElementById("purchasePrice").value);
+            const salePrice = parseFloat(document.getElementById("salePrice").value);
+            const propertyType = document.getElementById("propertyType").value;
+            const useService = document.getElementById("useService").checked;
+
+            let tax = 0;
+            let formula = '';
+            let details = '';
+
+            if (useService) {
+                let percentBuy = 0.23;
+                let percentSell = (propertyType === "Земля") ? 0.01 : 0.02;
+                tax = purchasePrice * percentBuy + salePrice * percentSell;
+                formula = `Податок = ${purchasePrice} × ${percentBuy * 100}% + ${salePrice} × ${percentSell * 100}% = ${tax.toFixed(2)} $`;
+                details = `Деталі: 18% ПДФО + 5% ВЗ + 1% держмито${propertyType !== "Земля" ? " + 1% пенсійний збір" : ""}.`;
+            } else {
+                let percentSell = 0;
+                switch (propertyType) {
+                    case "Квартира":
+                    case "Будинок":
+                    case "Комерційна нерухомість":
+                        percentSell = 0.12;
+                        details = "5% ПДФО + 5% ВЗ + 1% держмито + 1% пенсійний збір.";
+                        break;
+                    case "Земля":
+                        percentSell = 0.11;
+                        details = "5% ПДФО + 5% ВЗ + 1% держмито (без пенсійного збору).";
+                        break;
+                }
+                tax = salePrice * percentSell;
+                formula = `Податок = ${salePrice} × ${percentSell * 100}% = ${tax.toFixed(2)} $`;
+            }
+
+            document.getElementById("result").innerText = `Сума податку: ${tax.toFixed(2)} $`;
+            document.getElementById("formula").innerText = `Формула: ${formula}`;
+            document.getElementById("details").innerText = `Деталі: ${details}`;
+        }
+    </script>
+</body>
+</html>
