@@ -1,0 +1,123 @@
+
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Калькулятор податків на продаж нерухомості, яка у власності менше 3 років</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f8f9fa;
+        }
+        .container {
+            max-width: 500px;
+            margin: auto;
+            background: #fff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        label, select, input {
+            display: block;
+            width: 100%;
+            margin-top: 10px;
+            padding: 10px;
+            font-size: 1rem;
+        }
+        button {
+            margin-top: 20px;
+            padding: 10px;
+            font-size: 1rem;
+            background: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        .result, .formula, .details {
+            margin-top: 20px;
+            padding: 15px;
+            background: #e9ecef;
+            border-radius: 8px;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Калькулятор податків на продаж нерухомості, яка у власності менше 3 років</h2>
+        <label>Ціна купівлі ($):</label>
+        <input type="number" id="purchasePrice" />
+
+        <label>Ціна продажу ($):</label>
+        <input type="number" id="salePrice" />
+
+        <label>Тип нерухомості:</label>
+        <select id="propertyType">
+            <option value="Квартира">Квартира</option>
+            <option value="Будинок">Будинок</option>
+            <option value="Комерційна нерухомість">Комерційна нерухомість</option>
+            <option value="Земля">Земля</option>
+        </select>
+
+        <label><input type="checkbox" id="serviceUsed" /> Із застосуванням послуги</label>
+
+        <button onclick="calculateTax()">Розрахувати</button>
+
+        <div class="result" id="result"></div>
+        <div class="formula" id="formula"></div>
+        <div class="details" id="details"></div>
+    </div>
+
+    <script>
+        function calculateTax() {
+            const purchase = parseFloat(document.getElementById("purchasePrice").value);
+            const sale = parseFloat(document.getElementById("salePrice").value);
+            const type = document.getElementById("propertyType").value;
+            const usedService = document.getElementById("serviceUsed").checked;
+
+            if (isNaN(purchase) || isNaN(sale)) {
+                alert("Будь ласка, введіть коректні числа.");
+                return;
+            }
+
+            const gain = sale - purchase;
+            let tax = 0;
+            let formula = '';
+            let detail = '';
+
+            if (type === "Квартира" || type === "Будинок") {
+                if (usedService) {
+                    tax = sale * 0.12;
+                    formula = `Податок = ${sale} × 12% = ${tax.toFixed(2)} $`;
+                    detail = `Використано послугу. Весь об'єкт оподатковується за ставкою 12%.`;
+                } else {
+                    tax = gain * 0.18 + gain * 0.05 + sale * 0.02;
+                    formula = `Податок = (${gain} × 18%) + (${gain} × 5%) + (${sale} × 2%) = ${tax.toFixed(2)} $`;
+                    detail = `Різниця між купівлею і продажем: ${gain} $\nПДФО 18% + ВЗ 1.5% з прибутку + 2% з продажу.`;
+                }
+            } else if (type === "Комерційна нерухомість") {
+                if (usedService) {
+                    tax = sale * 0.10;
+                    formula = `Податок = ${sale} × 10% = ${tax.toFixed(2)} $`;
+                    detail = `Ставка 10% із застосуванням послуги.`;
+                } else {
+                    tax = gain * 0.18 + gain * 0.05 + sale * 0.02;
+                    formula = `Податок = (${gain} × 18%) + (${gain} × 5%) + (${sale} × 2%) = ${tax.toFixed(2)} $`;
+                    detail = `Оподаткування без пільги: прибуток ${gain}, додаткові податки з продажу.`;
+                }
+            } else if (type === "Земля") {
+                tax = sale * 0.11 + sale * 0.01;
+                formula = `Податок = (${sale} × 11%) + (${sale} × 1%) = ${tax.toFixed(2)} $`;
+                detail = `Оподаткування землі: ставка 12% із продажу.`;
+            }
+
+            document.getElementById("result").textContent = `Сума податку: ${tax.toFixed(2)} $`;
+            document.getElementById("formula").textContent = `Формула: ${formula}`;
+            document.getElementById("details").textContent = `Деталі: ${detail}`;
+        }
+    </script>
+</body>
+</html>
